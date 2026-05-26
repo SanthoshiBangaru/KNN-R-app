@@ -5,6 +5,7 @@
 import warnings
 warnings.filterwarnings("ignore")
 
+import os
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -15,6 +16,7 @@ from sklearn.datasets import load_diabetes
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.neighbors import KNeighborsRegressor
+
 from sklearn.metrics import (
     mean_absolute_error,
     mean_squared_error,
@@ -58,6 +60,7 @@ This application demonstrates regression using K-Nearest Neighbors Regressor.
 - Data Cleaning
 - Exploratory Data Analysis
 - Feature Scaling
+- Save Preprocessed Dataset
 - Model Training
 - Prediction
 - Model Evaluation
@@ -149,13 +152,47 @@ scaler = StandardScaler()
 
 X_scaled = scaler.fit_transform(X)
 
-st.success("Feature Scaling Applied Successfully")
+# Convert scaled data into dataframe
+
+X_scaled_df = pd.DataFrame(
+    X_scaled,
+    columns=X.columns
+)
+
+st.success("✅ Feature Scaling Applied Successfully")
+
+# =========================================================
+# SAVE PREPROCESSED DATA
+# =========================================================
+
+st.header("💾 Step 5 : Save Preprocessed Dataset")
+
+# Create data folder if not exists
+
+os.makedirs("data", exist_ok=True)
+
+# Combine scaled features and target
+
+processed_df = X_scaled_df.copy()
+
+processed_df["target"] = y.values
+
+if st.button("Save Preprocessed Data"):
+
+    processed_df.to_csv(
+        "data/preprocessed_diabetes.csv",
+        index=False
+    )
+
+    st.success(
+        "✅ Preprocessed dataset saved successfully in data/ folder"
+    )
 
 # =========================================================
 # EXPLORATORY DATA ANALYSIS
 # =========================================================
 
-st.header("📊 Step 5 : Exploratory Data Analysis")
+st.header("📊 Step 6 : Exploratory Data Analysis")
 
 # =========================================================
 # STATISTICAL SUMMARY
@@ -236,7 +273,7 @@ st.pyplot(fig3)
 # TRAIN TEST SPLIT
 # =========================================================
 
-st.header("✂️ Step 6 : Train Test Split")
+st.header("✂️ Step 7 : Train Test Split")
 
 X_train, X_test, y_train, y_test = train_test_split(
     X_scaled,
@@ -263,7 +300,7 @@ with col2:
 # MODEL TRAINING
 # =========================================================
 
-st.header("🤖 Step 7 : Model Training")
+st.header("🤖 Step 8 : Model Training")
 
 k = st.slider(
     "Select K Value",
@@ -278,13 +315,13 @@ model = KNeighborsRegressor(
 
 model.fit(X_train, y_train)
 
-st.success("KNN Regressor Model Trained Successfully")
+st.success("✅ KNN Regressor Model Trained Successfully")
 
 # =========================================================
 # PREDICTIONS
 # =========================================================
 
-st.header("📌 Step 8 : Predictions")
+st.header("📌 Step 9 : Predictions")
 
 y_pred = model.predict(X_test)
 
@@ -302,10 +339,12 @@ st.dataframe(
 # MODEL EVALUATION
 # =========================================================
 
-st.header("📉 Step 9 : Model Evaluation")
+st.header("📉 Step 10 : Model Evaluation")
 
 mae = mean_absolute_error(y_test, y_pred)
+
 mse = mean_squared_error(y_test, y_pred)
+
 r2 = r2_score(y_test, y_pred)
 
 col1, col2, col3 = st.columns(3)
@@ -368,7 +407,7 @@ st.pyplot(fig5)
 # USER INPUT
 # =========================================================
 
-st.header("🎯 Step 10 : Predict Diabetes Progression")
+st.header("🎯 Step 11 : Predict Diabetes Progression")
 
 user_input = []
 
